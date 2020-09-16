@@ -12,4 +12,5 @@
     "email": "hazurl@hazurl.me",
     "url": "https://www.hazurl.me"
   }
-]
+],
+"platforms": "espressif32"
