@@ -1,17 +1,19 @@
-"name": "esplib-lorasensorpackets",
-"version": "1.0.0",
-"repository":
 {
-    "type": "git",
-    "url": "https://github.com/docteurzoidberg/esplib-lorasensorpackets.git"
-},
-"authors":
-[
+  "name": "esplib-lorasensorpackets",
+  "version": "1.0.0",
+  "repository":
   {
-    "name": "Hazurl",
-    "email": "hazurl@hazurl.me",
-    "url": "https://www.hazurl.me"
-  }
-],
-"platforms": "espressif32",
-"frameworks": "arduino"
+      "type": "git",
+      "url": "https://github.com/docteurzoidberg/esplib-lorasensorpackets.git"
+  },
+  "authors":
+  [
+    {
+      "name": "Hazurl",
+      "email": "hazurl@hazurl.me",
+      "url": "https://www.hazurl.me"
+    }
+  ],
+  "platforms": "espressif32",
+  "frameworks": "arduino"
+}
