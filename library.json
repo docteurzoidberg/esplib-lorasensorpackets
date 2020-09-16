@@ -13,4 +13,5 @@
     "url": "https://www.hazurl.me"
   }
 ],
-"platforms": "espressif32"
+"platforms": "espressif32",
+"frameworks": "arduino"
