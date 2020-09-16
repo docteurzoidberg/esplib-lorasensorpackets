@@ -7,13 +7,13 @@ PacketWriter::PacketWriter(std::array<uint8_t, 2> id, std::size_t size_threshold
     , size_threshold(size_threshold)
     , on_packet_emit(on_packet_emit) {}
 
-Packet make_packet() {
-    Packet packet(id, std::move(buffer));
+Packet PacketWriter::make_packet() {
+    auto packet = Packet::construct_with_id(id, std::move(buffer));
     buffer.clear();
     return packet;
 }
 
-void flush() {
+void PacketWriter::flush() {
     auto packet = make_packet();
     if (on_packet_emit) {
         on_packet_emit(std::move(packet));

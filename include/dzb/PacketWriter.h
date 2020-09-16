@@ -25,7 +25,7 @@ public:
     std::function<void(Packet)> on_packet_emit;
 
 
-    PacketWriter::PacketWriter(std::array<uint8_t, 2> id, std::size_t size_threshold, std::function<void(Packet)> on_packet_emit);
+    PacketWriter(std::array<uint8_t, 2> id, std::size_t size_threshold, std::function<void(Packet)> on_packet_emit);
 
     // The size of value must not exceed the threshold
     template<typename T>
