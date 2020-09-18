@@ -28,9 +28,14 @@ void handleRadioData(){
     return;
   }
   int readBytes = LoRa.readBytes((uint8_t*) &packet, 52);
+
+  //TODO: parse and check packet
+
   packetCounter++;
   lastPacketReceived=millis();
   ESP_LOGD(TAG, "Received packet %d of %d bytes with RSSI %d",packetCounter,readBytes,LoRa.packetRssi());
+
+  //TODO: pretty print packet header, types/values
 }
 
 void setup(){
@@ -45,6 +50,7 @@ void setup(){
 }
 
 void loop(){
+  //TODO: use OnReceive callback ? (cf https://github.com/sandeepmistry/arduino-LoRa/blob/master/API.md)
   int packetSize = LoRa.parsePacket(52);
   if(packetSize){
     handleRadioData();
