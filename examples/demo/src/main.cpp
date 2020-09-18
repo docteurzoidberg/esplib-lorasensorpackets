@@ -18,48 +18,33 @@
 #define  BAND       433E6
 #define  PABOOST    true
 
+static const char *TAG = "DEMO";
 uint16_t packetCounter=0;
 uint32_t lastPacketReceived=0;
 uint8_t packet[53];
 
 void handleRadioData(){
-
-  // read packet(s)
   if (!LoRa.available()) {
     return;
   }
-
   int readBytes = LoRa.readBytes((uint8_t*) &packet, 52);
-  //if(readBytes!=sizeof(DeviceDataStruct)){
-    //ESP_LOGD(TAG, "Invalid packet size: %d", readBytes);
-    //return;
-  //}
-  //if(strcmp(newState.header,"J7")!=0){
-    //ESP_LOGD(TAG, "Invalid packet header: %s", newState.header);
-    //return;
-  //}
-
   packetCounter++;
   lastPacketReceived=millis();
-
-  //ESP_LOGD(TAG, "Received packet %d with RSSI %d", packetCounter, LoRa.packetRssi());
+  ESP_LOGD(TAG, "Received packet %d of %d bytes with RSSI %d",packetCounter,readBytes,LoRa.packetRssi());
 }
 
-void setup() {
-
+void setup(){
   SPI.begin(PIN_SCK,PIN_MISO,PIN_MOSI,PIN_SS);
   LoRa.setPins(PIN_SS,PIN_RST,PIN_DI00);
-
-  if (!LoRa.begin(BAND))
-  {
-    //ESP_LOGCONFIG(TAG, "Starting LoRa failed!");
-    while (1) {
+  if (!LoRa.begin(BAND)){
+    ESP_LOGD(TAG, "Starting LoRa failed!");
+    while(1){
       delay(1000);
     }
   }
 }
 
-void loop() {
+void loop(){
   int packetSize = LoRa.parsePacket(52);
   if(packetSize){
     handleRadioData();
