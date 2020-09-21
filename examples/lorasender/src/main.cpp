@@ -37,10 +37,8 @@ ulong lastAdcRead=0;
 ulong lastLoraReport=0;
 ulong packetCounter=0;
 
-
 struct DeviceDataStruct {
   char 				header[3];
-  //char 				device[6];
   uint64_t    timer;
   float       deviceBattVoltage;
   uint8_t     deviceBattPercent;
@@ -49,10 +47,8 @@ struct DeviceDataStruct {
   bool        deviceLowBatt;
 };
 
-
 DeviceDataStruct state = {
   .header="J7",
-  //.device="J7-1",
   .timer=0,
   .deviceBattVoltage=0.00f,
   .deviceBattPercent=100,
@@ -79,6 +75,7 @@ void readBatteryVoltage(){
   state.deviceLowBatt = state.deviceBattPercent<=10;
   lastAdcRead=millis();
 }
+
 void print64(uint64_t value) {
   const int NUM_DIGITS    = log10(value) + 1;
   char sz[NUM_DIGITS + 1];
