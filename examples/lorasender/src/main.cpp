@@ -111,9 +111,9 @@ void loraReportState() {
   //TODO: ?
   dzb::PacketWriter writer(dzb::id_t{ 'J', '7' }, 8 /* bytes */, check_packet);
 
+  writer.write(dzb::PacketType::PRESENCE, bool{ state.devicePirState });
   writer.write(dzb::PacketType::GPIO_D1, bool{ state.deviceAlarmActive });
-  writer.write(dzb::PacketType::GPIO_D2, bool{ state.devicePirState });
-  writer.write(dzb::PacketType::GPIO_D3, bool{ state.deviceLowBatt });
+  writer.write(dzb::PacketType::GPIO_D2, bool{ state.deviceLowBatt });
   writer.write(dzb::PacketType::BATT_PERCENT, uint8_t{ state.deviceBattPercent });
   writer.write(dzb::PacketType::BATT_VOLTAGE, float{ state.deviceBattVoltage });
 
