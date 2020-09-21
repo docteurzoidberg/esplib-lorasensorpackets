@@ -32,7 +32,22 @@ void on_lora_packet_received(int size) {
     Serial.println("CRC error");
   }
 
+  float batt_voltage=0.0f;
+  uint8_t batt_percent=0;
+  bool presence=0;
+  bool gpio_d1=0;
+  bool gpio_d2=0;
+
   dzb::PacketReader reader(packet);
+
+  reader.get_value(dzb::PacketType::PRESENCE, 0, presence);
+  reader.get_value(dzb::PacketType::GPIO_D1, 0, gpio_d1) ;
+  reader.get_value(dzb::PacketType::GPIO_D2, 0, gpio_d2) ;
+  reader.get_value(dzb::PacketType::BATT_PERCENT, 0, batt_percent);
+  reader.get_value(dzb::PacketType::BATT_VOLTAGE, 0, batt_voltage);
+
+  Serial.printf("Alarm=%d|LowBatt=%d|BattVoltage=%0.2f|BattPercent=%d|Presence=%d\n", gpio_d1,gpio_d2, batt_voltage, batt_percent, presence);
+
   // TODO: use reader.get_value(dzb::PacketType::*) to read data
 
   packetCounter++;
