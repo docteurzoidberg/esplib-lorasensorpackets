@@ -19,17 +19,15 @@
 #define  PABOOST    true
 
 static const char *TAG = "DEMO";
+
 uint16_t packetCounter=0;
 uint32_t lastPacketReceived=0;
-uint8_t raw_packet[53];
 
-void handleRadioData(){
-  if (!LoRa.available()) {
-    return;
-  }
-  
-  int readBytes = LoRa.readBytes((uint8_t*) &raw_packet, 52);
-  auto packet = dzb::Packet::deconstruct(raw_packet, readBytes);
+void on_lora_packet_received(int size) {
+  std::vector<uint8_t> buffer(size);
+  LoRa.readBytes(buffer.data(), size);
+
+  auto packet = dzb::Packet::deconstruct(buffer.data(), size);
 
   if (!packet.is_crc_valid()) {
     // TODO: handle error
@@ -40,9 +38,7 @@ void handleRadioData(){
 
   packetCounter++;
   lastPacketReceived=millis();
-  ESP_LOGD(TAG, "Received packet %d of %d bytes with RSSI %d",packetCounter,readBytes,LoRa.packetRssi());
-
-  //TODO: pretty print packet header, types/values
+  ESP_LOGD(TAG, "Received packet %d of %d bytes with RSSI %d", packetCounter, readBytes, LoRa.packetRssi());
 }
 
 void setup(){
@@ -54,12 +50,9 @@ void setup(){
       delay(1000);
     }
   }
+
+  LoRa.onReceive(on_lora_packet_received);
+  LoRa.receive();
 }
 
-void loop(){
-  //TODO: use OnReceive callback ? (cf https://github.com/sandeepmistry/arduino-LoRa/blob/master/API.md)
-  int packetSize = LoRa.parsePacket(52);
-  if(packetSize){
-    handleRadioData();
-  }
-}
+void loop(){}
