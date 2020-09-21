@@ -38,7 +38,7 @@ ulong lastLoraReport=0;
 ulong packetCounter=0;
 
 void send_packet(dzb::Packet const& packet);
-dzb::PacketWriter writer(dzb::id_t{ 'J', '7' }, 8 /* bytes */, send_packet);
+dzb::PacketWriter writer(dzb::id_t{ 'J', '7' }, 48 /* bytes, threshold */, send_packet);
 
 struct DeviceDataStruct {
   char 				header[3];
@@ -90,9 +90,9 @@ void print64(uint64_t value) {
 }
 
 void send_packet(dzb::Packet const& packet) {
-  LoRa.beginPacket(true);
+  LoRa.beginPacket();
   LoRa.write(packet.buffer.data(), packet.buffer.size());
-  LoRa.endPacket();
+  LoRa.endPacket(true); // async
 
   packetCounter++;
 }
@@ -124,6 +124,8 @@ void loraReportState() {
   writer.write(dzb::PacketType::GPIO_D2, bool{ state.deviceLowBatt });
   writer.write(dzb::PacketType::BATT_PERCENT, uint8_t{ state.deviceBattPercent });
   writer.write(dzb::PacketType::BATT_VOLTAGE, float{ state.deviceBattVoltage });
+
+  writer.flush(); // force sending packet
 
   lastLoraReport=millis();
 }
