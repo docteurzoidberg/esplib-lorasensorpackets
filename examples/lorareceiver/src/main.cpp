@@ -18,8 +18,6 @@
 #define  BAND       433E6
 #define  PABOOST    true
 
-static const char *TAG = "DEMO";
-
 uint16_t packetCounter=0;
 uint32_t lastPacketReceived=0;
 
@@ -38,14 +36,15 @@ void on_lora_packet_received(int size) {
 
   packetCounter++;
   lastPacketReceived=millis();
-  ESP_LOGD(TAG, "Received packet %d of %d bytes with RSSI %d", packetCounter, readBytes, LoRa.packetRssi());
+  Serial.printf("Received packet %d of %d bytes with RSSI %d\n", packetCounter, size, LoRa.packetRssi());
 }
 
 void setup(){
+  Serial.begin(115200);
   SPI.begin(PIN_SCK,PIN_MISO,PIN_MOSI,PIN_SS);
   LoRa.setPins(PIN_SS,PIN_RST,PIN_DI00);
   if (!LoRa.begin(BAND)){
-    ESP_LOGD(TAG, "Starting LoRa failed!");
+    Serial.println("Starting LoRa failed!");
     while(1){
       delay(1000);
     }
