@@ -80,11 +80,9 @@ void print64(uint64_t value) {
   const int NUM_DIGITS    = log10(value) + 1;
   char sz[NUM_DIGITS + 1];
   sz[NUM_DIGITS] =  0;
-  for ( size_t i = NUM_DIGITS; i--; value /= 10)
-  {
+  for ( size_t i = NUM_DIGITS; i--; value /= 10){
     sz[i] = '0' + (value % 10);
   }
-
   Serial.print(sz);
 }
 
@@ -95,7 +93,6 @@ void loraReportState() {
   }
 
   state.timer=(uint64_t)esp_timer_get_time();
-
 
   Serial.print("[LORA REPORT]");
   Serial.print(" TS=");
@@ -140,13 +137,12 @@ void alarmLoop() {
 
 void alarmEndLoop(){
   Serial.println("> Alarm end loop");
-  ulong endAlarmTime = millis();
   state.deviceAlarmActive=false;
   state.devicePirState=false;
   for(int i=0;i<5;i++){
     readBatteryVoltage();
     loraReportState();
-    delay(1020);
+    delay(1000);
   }
 }
 
@@ -192,7 +188,6 @@ void setup(){
   esp_sleep_enable_ext0_wakeup(GPIO_NUM_35, 1); //1 = High, 0 = Low
   esp_deep_sleep_start();
 }
-
 
 //never called
 void loop(){
