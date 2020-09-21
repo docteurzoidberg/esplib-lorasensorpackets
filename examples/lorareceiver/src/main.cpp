@@ -29,6 +29,7 @@ void on_lora_packet_received(int size) {
 
   if (!packet.is_crc_valid()) {
     // TODO: handle error
+    Serial.println("CRC error");
   }
 
   dzb::PacketReader reader(packet);
