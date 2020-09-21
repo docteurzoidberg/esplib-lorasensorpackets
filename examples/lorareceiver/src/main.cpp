@@ -21,15 +21,22 @@
 static const char *TAG = "DEMO";
 uint16_t packetCounter=0;
 uint32_t lastPacketReceived=0;
-uint8_t packet[53];
+uint8_t raw_packet[53];
 
 void handleRadioData(){
   if (!LoRa.available()) {
     return;
   }
-  int readBytes = LoRa.readBytes((uint8_t*) &packet, 52);
+  
+  int readBytes = LoRa.readBytes((uint8_t*) &raw_packet, 52);
+  auto packet = dzb::Packet::deconstruct(raw_packet, readBytes);
 
-  //TODO: parse and check packet
+  if (!packet.is_crc_valid()) {
+    // TODO: handle error
+  }
+
+  dzb::PacketReader reader(packet);
+  // TODO: use reader.get_value(dzb::PacketType::*) to read data
 
   packetCounter++;
   lastPacketReceived=millis();
