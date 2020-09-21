@@ -37,6 +37,9 @@ ulong lastAdcRead=0;
 ulong lastLoraReport=0;
 ulong packetCounter=0;
 
+void send_packet(dzb::Packet const& packet);
+dzb::PacketWriter writer(dzb::id_t{ 'J', '7' }, 8 /* bytes */, send_packet);
+
 struct DeviceDataStruct {
   char 				header[3];
   uint64_t    timer;
@@ -86,6 +89,14 @@ void print64(uint64_t value) {
   Serial.print(sz);
 }
 
+void send_packet(dzb::Packet const& packet) {
+  LoRa.beginPacket(true);
+  LoRa.write(packet.buffer.data(), packet.buffer.size());
+  LoRa.endPacket();
+
+  packetCounter++;
+}
+
 void loraReportState() {
 
   if(((millis()-lastLoraReport)<(LORA_REPORT_TIMER*1000)) && (lastLoraReport>0)){
@@ -108,22 +119,12 @@ void loraReportState() {
   Serial.print(" Lowbatt=");
   Serial.println(String(state.deviceLowBatt));
 
-  //TODO: ?
-  dzb::PacketWriter writer(dzb::id_t{ 'J', '7' }, 8 /* bytes */, check_packet);
-
   writer.write(dzb::PacketType::PRESENCE, bool{ state.devicePirState });
   writer.write(dzb::PacketType::GPIO_D1, bool{ state.deviceAlarmActive });
   writer.write(dzb::PacketType::GPIO_D2, bool{ state.deviceLowBatt });
   writer.write(dzb::PacketType::BATT_PERCENT, uint8_t{ state.deviceBattPercent });
   writer.write(dzb::PacketType::BATT_VOLTAGE, float{ state.deviceBattVoltage });
 
-  // send packet
-  LoRa.beginPacket(true);
-  //TODO: use lib
-  LoRa.write((const uint8_t*)&???,sizeof(???)); //TODO: ?
-  LoRa.endPacket();
-
-  packetCounter++;
   lastLoraReport=millis();
 }
 
@@ -156,6 +157,9 @@ void alarmEndLoop(){
 }
 
 void setup(){
+
+    dzb::init_packet_type_meta();
+    dzb::init_crc_table();
 
   pinMode(PIR_DATA, INPUT);
 
