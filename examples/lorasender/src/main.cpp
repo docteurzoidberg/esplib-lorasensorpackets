@@ -38,6 +38,29 @@ ulong lastLoraReport=0;
 ulong packetCounter=0;
 
 
+struct DeviceDataStruct {
+  char 				header[3];
+  //char 				device[6];
+  uint64_t    timer;
+  float       deviceBattVoltage;
+  uint8_t     deviceBattPercent;
+  bool        devicePirState;
+  bool        deviceAlarmActive;
+  bool        deviceLowBatt;
+};
+
+
+DeviceDataStruct state = {
+  .header="J7",
+  //.device="J7-1",
+  .timer=0,
+  .deviceBattVoltage=0.00f,
+  .deviceBattPercent=100,
+  .devicePirState=false,
+  .deviceAlarmActive=false,
+  .deviceLowBatt=false
+};
+
 bool readPIR(){
   if(((millis()-lastPirRead)<1000) && (lastPirRead!=0)){
     return state.devicePirState;
@@ -56,51 +79,6 @@ void readBatteryVoltage(){
   state.deviceLowBatt = state.deviceBattPercent<=10;
   lastAdcRead=millis();
 }
-
-void setup(){
-
-  pinMode(PIR_DATA, INPUT);
-
-  wakeup_reason = esp_sleep_get_wakeup_cause();
-
-  Serial.begin(115200);
-  Serial.setDebugOutput(true);
-  Serial.print("IDS-DEVICE: Starting ! (reason=");
-  Serial.print(wakeup_reason);
-  Serial.println(")");
-
-  SPI.begin(SCK,MISO,MOSI,SS);
-  LoRa.setPins(SS,RST,DI00);
-
-  if(bootCount == 0)
-    bootCount++;
-
-  if (!LoRa.begin(BAND)){
-    Serial.println("IDS-DEVICE: Starting LoRa failed!");
-    Serial.flush();
-    delay(1000);
-    ESP.restart();
-  }
-
-  readBatteryVoltage();
-
-  if(readPIR()){
-    alarmLoop();
-    alarmEndLoop();
-  }else{
-    loraReportState();
-    drawScreen();
-  }
-
-  delay(2000);
-
-  Serial.println("IDS-DEVICE: going to sleep !");
-  Serial.flush();
-  esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
-  esp_sleep_enable_ext0_wakeup(GPIO_NUM_35, 1); //1 = High, 0 = Low
-  esp_deep_sleep_start();
-}
-
 void print64(uint64_t value) {
   const int NUM_DIGITS    = log10(value) + 1;
   char sz[NUM_DIGITS + 1];
@@ -174,6 +152,50 @@ void alarmEndLoop(){
     delay(1020);
   }
 }
+
+void setup(){
+
+  pinMode(PIR_DATA, INPUT);
+
+  wakeup_reason = esp_sleep_get_wakeup_cause();
+
+  Serial.begin(115200);
+  Serial.setDebugOutput(true);
+  Serial.print("IDS-DEVICE: Starting ! (reason=");
+  Serial.print(wakeup_reason);
+  Serial.println(")");
+
+  SPI.begin(SCK,MISO,MOSI,SS);
+  LoRa.setPins(SS,RST,DI00);
+
+  if(bootCount == 0)
+    bootCount++;
+
+  if (!LoRa.begin(BAND)){
+    Serial.println("IDS-DEVICE: Starting LoRa failed!");
+    Serial.flush();
+    delay(1000);
+    ESP.restart();
+  }
+
+  readBatteryVoltage();
+
+  if(readPIR()){
+    alarmLoop();
+    alarmEndLoop();
+  }else{
+    loraReportState();
+  }
+
+  delay(2000);
+
+  Serial.println("IDS-DEVICE: going to sleep !");
+  Serial.flush();
+  esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
+  esp_sleep_enable_ext0_wakeup(GPIO_NUM_35, 1); //1 = High, 0 = Low
+  esp_deep_sleep_start();
+}
+
 
 //never called
 void loop(){
