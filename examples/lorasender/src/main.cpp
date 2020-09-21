@@ -108,10 +108,19 @@ void loraReportState() {
   Serial.print(" Lowbatt=");
   Serial.println(String(state.deviceLowBatt));
 
+  //TODO: ?
+  dzb::PacketWriter writer(dzb::id_t{ 'J', '7' }, 8 /* bytes */, check_packet);
+
+  writer.write(dzb::PacketType::GPIO_D1, bool{ state.deviceAlarmActive });
+  writer.write(dzb::PacketType::GPIO_D2, bool{ state.devicePirState });
+  writer.write(dzb::PacketType::GPIO_D3, bool{ state.deviceLowBatt });
+  writer.write(dzb::PacketType::BATT_PERCENT, uint8_t{ state.deviceBattPercent });
+  writer.write(dzb::PacketType::BATT_VOLTAGE, float{ state.deviceBattVoltage });
+
   // send packet
   LoRa.beginPacket(true);
   //TODO: use lib
-  LoRa.write((const uint8_t*)&state,sizeof(DeviceDataStruct));
+  LoRa.write((const uint8_t*)&???,sizeof(???)); //TODO: ?
   LoRa.endPacket();
 
   packetCounter++;
