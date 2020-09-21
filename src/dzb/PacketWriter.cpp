@@ -14,9 +14,11 @@ Packet PacketWriter::make_packet() {
 }
 
 void PacketWriter::flush() {
-    auto packet = make_packet();
-    if (on_packet_emit) {
-        on_packet_emit(std::move(packet));
+    if(buffer.size() > 0) {
+        auto packet = make_packet();
+        if (on_packet_emit) {
+            on_packet_emit(std::move(packet));
+        }
     }
 }
 

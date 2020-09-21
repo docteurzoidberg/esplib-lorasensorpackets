@@ -25,7 +25,8 @@ std::vector<uint8_t const*> parse_packet(uint8_t const* packet, std::size_t size
 
 uint8_t const* get_packet_of_type(std::vector<uint8_t const*> const& packets, PacketType type, std::size_t ordinal) {
     for(auto packet : packets) {
-        auto packet_type = deserialize<PacketType>(packet);
+        auto packet_ = packet;
+        auto packet_type = deserialize<PacketType>(packet_);
         if (packet_type == type && ordinal-- == 0) {
             return packet;
         } 

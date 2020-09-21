@@ -14,7 +14,6 @@ struct PacketWriter {
 private:
 
     Packet make_packet();
-    void flush();
 
     std::vector<uint8_t> buffer;
 
@@ -26,6 +25,8 @@ public:
 
 
     PacketWriter(id_t id, std::size_t size_threshold, std::function<void(Packet)> on_packet_emit);
+
+    void flush();
 
     // The size of value must not exceed the threshold
     template<typename T>
