@@ -18,7 +18,9 @@ Packet Packet::deconstruct(uint8_t const* packet_buffer, std::size_t size) {
 }
 
 Packet Packet::construct_with_id(std::array<uint8_t, 2> id, std::vector<uint8_t> data_buffer) {
-    return Packet(id, std::move(data_buffer));
+    Packet packet(id, std::move(data_buffer));
+    packet.write_crc();
+    return packet;
 }
 
 void Packet::write_header(std::array<uint8_t, 2> id) {
