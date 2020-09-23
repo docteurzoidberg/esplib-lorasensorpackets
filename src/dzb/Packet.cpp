@@ -61,7 +61,7 @@ bool Packet::is_crc_valid() const {
     return compute_crc() == get_crc();
 }
 
-bool Packet::is_from_device(char const (&id)[2]) const {
+bool Packet::is_from_device(char const (&id)[3]) const {
   return get_id()[0] == id[0] && get_id()[1] == id[1];
 }
 

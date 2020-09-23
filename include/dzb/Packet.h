@@ -37,7 +37,7 @@ public:
     uint8_t get_crc() const;
     std::pair<uint8_t const*, std::size_t> get_data() const;
 
-    bool is_from_device(char const (&id)[2]) const;
+    bool is_from_device(char const (&id)[3]) const;
     bool is_crc_valid() const;
 
     std::vector<uint8_t> buffer;
