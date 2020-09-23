@@ -104,7 +104,7 @@ void loraReportState() {
 
   state.timer=(uint64_t)esp_timer_get_time();
 
-  Serial.print("[LORA REPORT]");
+  Serial.print("[LORA SND]");
   Serial.print(" TS=");
   print64(state.timer);
   Serial.print(" Alarm=");
