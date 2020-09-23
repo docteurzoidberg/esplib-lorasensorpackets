@@ -118,9 +118,10 @@ void loraReportState() {
   Serial.print(" Lowbatt=");
   Serial.println(String(state.deviceLowBatt));
 
+  writer.write(dzb::PacketType::TIMESTAMP, uint64_t{ state.timer });
   writer.write(dzb::PacketType::PRESENCE, bool{ state.devicePirState });
-  writer.write(dzb::PacketType::GPIO_D1, bool{ state.deviceAlarmActive });
-  writer.write(dzb::PacketType::GPIO_D2, bool{ state.deviceLowBatt });
+  writer.write(dzb::PacketType::ALARM, bool{ state.deviceAlarmActive });
+  writer.write(dzb::PacketType::BATT_LOW, bool{ state.deviceLowBatt });
   writer.write(dzb::PacketType::BATT_PERCENT, uint8_t{ state.deviceBattPercent });
   writer.write(dzb::PacketType::BATT_VOLTAGE, float{ state.deviceBattVoltage });
   writer.flush(); // force sending packet

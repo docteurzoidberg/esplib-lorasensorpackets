@@ -95,16 +95,11 @@ void print_packet(dzb::Packet const& packet) {
     Serial.print('\n');
 }
 
-void on_lora_packet_received(int size) {
-  std::vector<uint8_t> buffer(size);
+void parse_packet(dzb::Packet const& packet) {
 
-  size = LoRa.readBytes(buffer.data(), size);
-  //print_buffer(buffer.data(), size);
-
-  Serial.printf("[LORA RCV] Received packet %d of %d bytes with RSSI %d\n", packetCounter, size, LoRa.packetRssi());
-
-  auto packet = dzb::Packet::deconstruct(buffer.data(), size);
+  //auto packet = dzb::Packet::deconstruct(buffer.data(), size);
   //print_packet(packet);
+  //print_packet_content(packet); //fonctionne pas?
 
   if (!packet.is_crc_valid()) {
     // TODO: handle error
@@ -113,29 +108,95 @@ void on_lora_packet_received(int size) {
     return;
   }
 
-  float batt_voltage=0.0f;
-  uint8_t batt_percent=0;
-  bool presence=0;
-  bool gpio_d1=0;
-  bool gpio_d2=0;
-
   dzb::PacketReader reader(packet);
-  if(
-    reader.get_value(dzb::PacketType::PRESENCE, 0, presence) &&
-    reader.get_value(dzb::PacketType::GPIO_D1, 0, gpio_d1) &&
-    reader.get_value(dzb::PacketType::GPIO_D2, 0, gpio_d2) &&
-    reader.get_value(dzb::PacketType::BATT_PERCENT, 0, batt_percent)&&
-    reader.get_value(dzb::PacketType::BATT_VOLTAGE, 0, batt_voltage)&&
-  true) {
-    //?
+
+  char devicestring[3] = "  ";
+  //HELP :D
+
+  //ONE DEVICE: J7
+  if(packet.is_from_device("J7")) {
+
+    uint64_t timer=0;
+    float batt_voltage=0.0f;
+    uint8_t batt_percent=0;
+    bool presence=0;
+    bool batt_low=0;
+    bool alarm=0;
+
+    if(reader.get_value(dzb::PacketType::TIMESTAMP, 0, timer)) {
+      //TODO: something with the value
+    }
+    else {
+      Serial.printf("[PACKET][FROM:%s][ERROR] Could not get TIMESTAMP\n", devicestring);
+    }
+
+    if(reader.get_value(dzb::PacketType::PRESENCE, 0, presence)) {
+      //TODO: something with the value
+    }
+    else {
+      Serial.printf("[PACKET][FROM:%s][ERROR] Could not get PRESENCE\n", devicestring);
+    }
+
+    if(reader.get_value(dzb::PacketType::ALARM, 0, alarm)) {
+      //TODO: something with the value
+    }
+    else {
+      Serial.printf("[PACKET][FROM:%s][ERROR] Could not get ALARM\n", devicestring);
+    }
+
+    if(reader.get_value(dzb::PacketType::BATT_LOW, 0, batt_low)) {
+      //TODO: something with the value
+    }
+    else {
+      Serial.printf("[PACKET][FROM:%s][ERROR] Could not get BATT_LOW\n" , devicestring);
+    }
+
+    if(reader.get_value(dzb::PacketType::BATT_PERCENT, 0, batt_percent)) {
+      //TODO: something with the value
+    }
+    else {
+      Serial.printf("[PACKET][FROM:%s][ERROR] Could not get BATT_PERCENT\n", devicestring);
+    }
+
+    if(reader.get_value(dzb::PacketType::BATT_VOLTAGE, 0, batt_voltage)) {
+      //TODO: something with the value
+    }
+    else {
+      Serial.printf("[PACKET][FROM:%s][ERROR] Could not get BATT_VOLTAGE\n", devicestring);
+    }
+
+    Serial.printf("[PACKET][FROM:%s][DATA] Alarm=%d|LowBatt=%d|BattVoltage=%0.2f|BattPercent=%d|Presence=%d\n", devicestring, alarm, batt_low, batt_voltage, batt_percent, presence);
   }
+  //ANOTHER DEVICE
+  else if(packet.is_from_device("XX")) {
+    //another device
+    Serial.printf("[PACKET][FROM:%s][DATA] data...\n", devicestring);
+  }
+   //UNKNOWN DEVICE
   else {
-    Serial.println("[PACKET] Error: Not all values where read");
+    Serial.printf("[PACKET][FROM:%s][ERROR] Unknown device %s\n", devicestring, devicestring);
   }
 
-  Serial.printf("[LORA RCV] Alarm=%d|LowBatt=%d|BattVoltage=%0.2f|BattPercent=%d|Presence=%d\n", gpio_d1,gpio_d2, batt_voltage, batt_percent, presence);
+}
+
+void on_lora_packet_received(int size) {
+
+  std::vector<uint8_t> buffer(size);
+
+  int readsize = LoRa.readBytes(buffer.data(), size);
+  if(size!=readsize) {
+    Serial.println("[LORA RECEIVER] Lora packet size mismatch");
+    return;
+  }
+
   packetCounter++;
   lastPacketReceived=millis();
+  //print_buffer(buffer.data(), size);
+
+  Serial.printf("[LORA RECEIVER] Received packet %d of %d bytes with RSSI %d\n", packetCounter, size, LoRa.packetRssi());
+
+  auto packet = dzb::Packet::deconstruct(buffer.data(), size);
+  parse_packet(packet);
 }
 
 void setup(){
@@ -148,7 +209,7 @@ void setup(){
   dzb::init_crc_table();
 
   if (!LoRa.begin(BAND)){
-    Serial.println("[LORA RCV] Starting LoRa failed!");
+    Serial.println("[LORA RECEIVER] Starting LoRa failed!");
     while(1){
       delay(1000);
     }
