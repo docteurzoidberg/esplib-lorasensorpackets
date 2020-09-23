@@ -12,14 +12,14 @@ enum class PacketType : uint8_t {
     LUMINOSITY      = 4,     // uint16_t
     DISTANCE        = 5,     // uint16_t
 
+    SWITCH          = 8,     // bool
+    PRESENCE        = 9,     // bool
+
     BATT_VOLTAGE    = 16,    // float
     BATT_PERCENT    = 17,    // uint8_t
     BATT_LOW        = 18,    // bool
     BATT_FULL       = 19,    // bool
     BATT_CHARGING   = 20,    // bool
-
-    SWITCH          = 8,     // bool
-    PRESENCE        = 9,     // bool
 
     ALARM           = 32,    // bool
 
@@ -37,7 +37,9 @@ enum class PacketType : uint8_t {
     GPIO_A0         = 128,   // uint16_t
     GPIO_A1         = 129,   // uint16_t
     GPIO_A2         = 130,   // uint16_t
-    GPIO_A3         = 131    // uint16_t
+    GPIO_A3         = 131,   // uint16_t
+
+    TIMESTAMP       = 192    // uint64_t
 
     // If you add a type, make sure to integrate it into 'init_packet_type_meta' defined in 'src/PacketType.cpp'
 };

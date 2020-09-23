@@ -47,6 +47,8 @@ void init_packet_type_meta() {
     ADD_TYPE(GPIO_A2, uint16_t);
     ADD_TYPE(GPIO_A3, uint16_t);
 
+    ADD_TYPE(TIMESTAMP, uint64_t);
+
 #undef ADD_TYPE
 }
 
