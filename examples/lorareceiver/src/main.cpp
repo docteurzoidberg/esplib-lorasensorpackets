@@ -60,13 +60,51 @@ void print_packet_content(dzb::Packet const& packet) {
   }
 }
 
+
+
+void print_packet(dzb::Packet const& packet) {
+    Serial.println("ID: ");
+    Serial.print(packet.get_id()[0]);
+    Serial.print(packet.get_id()[1]);
+    Serial.print('\n');
+
+    Serial.println("Ack: ");
+    Serial.print(packet.get_ack());
+    Serial.print('\n');
+
+    Serial.println("CRC: ");
+    Serial.print(packet.get_crc());
+    Serial.print('\n');
+
+    Serial.println("Buffer: ");
+    auto buffer = packet.get_data().first;
+    auto size = packet.get_data().second;
+
+    Serial.write(buffer, size);
+    Serial.println("// EOP //");
+
+    dzb::PacketType type = dzb::deserialize<dzb::PacketType>(buffer);
+    Serial.println("");
+    Serial.print(static_cast<uint8_t>(type));
+    Serial.print(" | ");
+    Serial.print(dzb::is_type_known(type) ? "known" : "unknown");
+    Serial.print(" | name: ");
+    Serial.print(dzb::name_of_type(type));
+    Serial.print(" | size of payload: ");
+    Serial.print(dzb::size_of_packet(type));
+    Serial.print('\n');
+}
+
+
 void on_lora_packet_received(int size) {
   std::vector<uint8_t> buffer(size);
-  LoRa.readBytes(buffer.data(), size);
+
+  size = LoRa.readBytes(buffer.data(), size);
+
   print_buffer(buffer.data(), size);
 
   auto packet = dzb::Packet::deconstruct(buffer.data(), size);
-  print_packet_content(packet);
+  print_packet(packet);
 
   if (!packet.is_crc_valid()) {
     // TODO: handle error
@@ -78,8 +116,6 @@ void on_lora_packet_received(int size) {
   bool presence=0;
   bool gpio_d1=0;
   bool gpio_d2=0;
-
-
 
   dzb::PacketReader reader(packet);
 
@@ -99,6 +135,10 @@ void on_lora_packet_received(int size) {
 }
 
 void setup(){
+
+  dzb::init_packet_type_meta();
+  dzb::init_crc_table();
+
   Serial.begin(115200);
   SPI.begin(PIN_SCK,PIN_MISO,PIN_MOSI,PIN_SS);
   LoRa.setPins(PIN_SS,PIN_RST,PIN_DI00);

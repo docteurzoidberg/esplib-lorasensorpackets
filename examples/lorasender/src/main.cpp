@@ -93,7 +93,6 @@ void send_packet(dzb::Packet const& packet) {
   LoRa.beginPacket();
   LoRa.write(packet.buffer.data(), packet.buffer.size());
   LoRa.endPacket(true); // async
-
   packetCounter++;
 }
 
@@ -124,7 +123,6 @@ void loraReportState() {
   writer.write(dzb::PacketType::GPIO_D2, bool{ state.deviceLowBatt });
   writer.write(dzb::PacketType::BATT_PERCENT, uint8_t{ state.deviceBattPercent });
   writer.write(dzb::PacketType::BATT_VOLTAGE, float{ state.deviceBattVoltage });
-
   writer.flush(); // force sending packet
 
   lastLoraReport=millis();
@@ -160,8 +158,8 @@ void alarmEndLoop(){
 
 void setup(){
 
-    dzb::init_packet_type_meta();
-    dzb::init_crc_table();
+  dzb::init_packet_type_meta();
+  dzb::init_crc_table();
 
   pinMode(PIR_DATA, INPUT);
 
