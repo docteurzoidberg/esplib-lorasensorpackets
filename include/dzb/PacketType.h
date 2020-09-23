@@ -5,28 +5,38 @@
 namespace dzb {
 
 enum class PacketType : uint8_t {
-    TEMPERATURE    = 1, // float
-    HUMIDITY       = 2, // uint8_t
-    BATT_VOLTAGE   = 4, // float
-    BATT_PERCENT   = 8, // uint8_t
-    LUMINOSITY     = 16, // uint8_t
-    PRESENCE       = 32, // bool
 
-    GPIO_D0        = 64, // bool
-    GPIO_D1        = 65, // bool
-    GPIO_D2        = 66, // bool
-    GPIO_D3        = 67, // bool
-    GPIO_D4        = 68, // bool
-    GPIO_D5        = 69, // bool
-    GPIO_D6        = 70, // bool
-    GPIO_D7        = 71, // bool
-    GPIO_D8        = 72, // bool
-    GPIO_D9        = 73, // bool
-    
-    GPIO_A0        = 128, // uint16_t
-    GPIO_A1        = 129, // uint16_t
-    GPIO_A2        = 130, // uint16_t
-    GPIO_A3        = 131  // uint16_t
+    TEMPERATURE     = 1,     // float
+    HUMIDITY        = 2,     // uint8_t
+    PRESSURE        = 3,     // uint16_t
+    LUMINOSITY      = 4,     // uint8_t
+
+    BATT_VOLTAGE    = 16,    // float
+    BATT_PERCENT    = 17,    // uint8_t
+    BATT_LOW        = 18,    // bool
+    BATT_FULL       = 19,    // bool
+    BATT_CHARGING   = 20,    // bool
+
+    SWITCH          = 8,     // bool
+    PRESENCE        = 9,     // bool
+
+    ALARM           = 32,    // bool
+
+    GPIO_D0         = 64,    // bool
+    GPIO_D1         = 65,    // bool
+    GPIO_D2         = 66,    // bool
+    GPIO_D3         = 67,    // bool
+    GPIO_D4         = 68,    // bool
+    GPIO_D5         = 69,    // bool
+    GPIO_D6         = 70,    // bool
+    GPIO_D7         = 71,    // bool
+    GPIO_D8         = 72,    // bool
+    GPIO_D9         = 73,    // bool
+
+    GPIO_A0         = 128,   // uint16_t
+    GPIO_A1         = 129,   // uint16_t
+    GPIO_A2         = 130,   // uint16_t
+    GPIO_A3         = 131    // uint16_t
 
     // If you add a type, make sure to integrate it into 'init_packet_type_meta' defined in 'src/PacketType.cpp'
 };
