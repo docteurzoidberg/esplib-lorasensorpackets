@@ -9,7 +9,8 @@ enum class PacketType : uint8_t {
     TEMPERATURE     = 1,     // float
     HUMIDITY        = 2,     // uint8_t
     PRESSURE        = 3,     // uint16_t
-    LUMINOSITY      = 4,     // uint8_t
+    LUMINOSITY      = 4,     // uint16_t
+    DISTANCE        = 5,     // uint16_t
 
     BATT_VOLTAGE    = 16,    // float
     BATT_PERCENT    = 17,    // uint8_t

@@ -17,7 +17,8 @@ void init_packet_type_meta() {
     ADD_TYPE(TEMPERATURE,   float);
     ADD_TYPE(HUMIDITY,      uint8_t);
     ADD_TYPE(PRESSURE,      uint16_t);
-    ADD_TYPE(LUMINOSITY,    uint8_t);
+    ADD_TYPE(LUMINOSITY,    uint16_t);
+    ADD_TYPE(DISTANCE,      uint16_t);
 
     ADD_TYPE(BATT_VOLTAGE,  float);
     ADD_TYPE(BATT_PERCENT,  uint8_t);
