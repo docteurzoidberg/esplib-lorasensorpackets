@@ -51,7 +51,7 @@ std::array<uint8_t, 2> Packet::get_id() const {
 
 uint8_t Packet::get_ack() const {
     return buffer[3];
-}  
+}
 
 uint8_t Packet::get_crc() const {
     return buffer[CRC_INDEX];
@@ -59,6 +59,10 @@ uint8_t Packet::get_crc() const {
 
 bool Packet::is_crc_valid() const {
     return compute_crc() == get_crc();
+}
+
+bool Packet::is_from_device(char const (&id)[2]) const {
+  return get_id()[0] == id[0] && get_id()[1] == id[1];
 }
 
 std::pair<uint8_t const*, std::size_t> Packet::get_data() const {
