@@ -126,6 +126,9 @@ void test_packet(dzb::Packet const& packet) {
     print_packet(packet);
     print_packet_reader(reader);
 
+    TEST_ASSERT((dzb::id_t{ 'A', 'Z' } == packet.get_id()));
+    TEST_ASSERT(packet.is_crc_valid());
+
     float temp = 0;
     uint8_t batt_percent0 = 0, batt_percent1 = 0;
     uint8_t lum = 0;
