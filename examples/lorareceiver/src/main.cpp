@@ -60,12 +60,12 @@ void print_packet_content(dzb::Packet const& packet) {
   }
 }
 
-
-
 void print_packet(dzb::Packet const& packet) {
+
+    Serial.print('\n');
     Serial.println("ID: ");
-    Serial.print(packet.get_id()[0]);
-    Serial.print(packet.get_id()[1]);
+    Serial.printf("%c",packet.get_id()[0]);
+    Serial.printf("%c",packet.get_id()[1]);
     Serial.print('\n');
 
     Serial.println("Ack: ");
@@ -95,20 +95,22 @@ void print_packet(dzb::Packet const& packet) {
     Serial.print('\n');
 }
 
-
 void on_lora_packet_received(int size) {
   std::vector<uint8_t> buffer(size);
 
   size = LoRa.readBytes(buffer.data(), size);
+  //print_buffer(buffer.data(), size);
 
-  print_buffer(buffer.data(), size);
+  Serial.printf("[LORA RCV] Received packet %d of %d bytes with RSSI %d\n", packetCounter, size, LoRa.packetRssi());
 
   auto packet = dzb::Packet::deconstruct(buffer.data(), size);
-  print_packet(packet);
+  //print_packet(packet);
 
   if (!packet.is_crc_valid()) {
     // TODO: handle error
-    Serial.println("CRC error");
+    Serial.println("[PACKET] CRC error");
+    print_packet(packet);
+    return;
   }
 
   float batt_voltage=0.0f;
@@ -118,32 +120,35 @@ void on_lora_packet_received(int size) {
   bool gpio_d2=0;
 
   dzb::PacketReader reader(packet);
+  if(
+    reader.get_value(dzb::PacketType::PRESENCE, 0, presence) &&
+    reader.get_value(dzb::PacketType::GPIO_D1, 0, gpio_d1) &&
+    reader.get_value(dzb::PacketType::GPIO_D2, 0, gpio_d2) &&
+    reader.get_value(dzb::PacketType::BATT_PERCENT, 0, batt_percent)&&
+    reader.get_value(dzb::PacketType::BATT_VOLTAGE, 0, batt_voltage)&&
+  true) {
+    //?
+  }
+  else {
+    Serial.println("[PACKET] Error: Not all values where read");
+  }
 
-  reader.get_value(dzb::PacketType::PRESENCE, 0, presence);
-  reader.get_value(dzb::PacketType::GPIO_D1, 0, gpio_d1) ;
-  reader.get_value(dzb::PacketType::GPIO_D2, 0, gpio_d2) ;
-  reader.get_value(dzb::PacketType::BATT_PERCENT, 0, batt_percent);
-  reader.get_value(dzb::PacketType::BATT_VOLTAGE, 0, batt_voltage);
-
-  Serial.printf("Alarm=%d|LowBatt=%d|BattVoltage=%0.2f|BattPercent=%d|Presence=%d\n", gpio_d1,gpio_d2, batt_voltage, batt_percent, presence);
-
-  // TODO: use reader.get_value(dzb::PacketType::*) to read data
-
+  Serial.printf("[LORA RCV] Alarm=%d|LowBatt=%d|BattVoltage=%0.2f|BattPercent=%d|Presence=%d\n", gpio_d1,gpio_d2, batt_voltage, batt_percent, presence);
   packetCounter++;
   lastPacketReceived=millis();
-  Serial.printf("Received packet %d of %d bytes with RSSI %d\n", packetCounter, size, LoRa.packetRssi());
 }
 
 void setup(){
 
-  dzb::init_packet_type_meta();
-  dzb::init_crc_table();
-
   Serial.begin(115200);
   SPI.begin(PIN_SCK,PIN_MISO,PIN_MOSI,PIN_SS);
   LoRa.setPins(PIN_SS,PIN_RST,PIN_DI00);
+
+  dzb::init_packet_type_meta();
+  dzb::init_crc_table();
+
   if (!LoRa.begin(BAND)){
-    Serial.println("Starting LoRa failed!");
+    Serial.println("[LORA RCV] Starting LoRa failed!");
     while(1){
       delay(1000);
     }
