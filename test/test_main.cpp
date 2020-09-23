@@ -79,8 +79,6 @@ void print_raw(T const& value) {
 }
 
 void print_packet(dzb::Packet const& packet) {
-    logln("Packet emitted:");
-
     log("ID: ");
     print_char(packet.get_id()[0]);
     print_char(packet.get_id()[1]);
@@ -123,6 +121,42 @@ void print_packet_reader(dzb::PacketReader const& reader) {
     }
 }
 
+void test_packet(dzb::Packet const& packet) {
+    dzb::PacketReader reader(packet);
+    print_packet(packet);
+    print_packet_reader(reader);
+
+    float temp = 0;
+    uint8_t batt_percent0 = 0, batt_percent1 = 0;
+    uint8_t lum = 0;
+    bool gpio_d1 = false;
+    uint16_t gpio_a0 = 0;
+
+    if (
+        reader.get_value(dzb::PacketType::TEMPERATURE, 0, temp) && 
+        reader.get_value(dzb::PacketType::BATT_PERCENT, 0, batt_percent0) &&
+        reader.get_value(dzb::PacketType::BATT_PERCENT, 1, batt_percent1) &&
+        reader.get_value(dzb::PacketType::LUMINOSITY, 0, lum) &&
+        reader.get_value(dzb::PacketType::GPIO_D1, 0, gpio_d1) &&
+        reader.get_value(dzb::PacketType::GPIO_A0, 0, gpio_a0) &&
+        true
+    ) {
+        TEST_ASSERT_EQUAL_UINT8(85, batt_percent0);
+        TEST_ASSERT_EQUAL_UINT8(12, batt_percent1);
+
+        TEST_ASSERT_EQUAL_UINT8(32, lum);
+
+        TEST_ASSERT_EQUAL_UINT16(2020, gpio_a0);
+
+        TEST_ASSERT_FLOAT_WITHIN(0.1, 21, temp);
+
+        TEST_ASSERT_EQUAL(true, gpio_d1);
+    } else {
+        errln("Some value could not be retrieved");
+        TEST_FAIL();
+    }
+}
+
 void setup() {
 
     dzb::init_packet_type_meta();
@@ -132,42 +166,14 @@ void setup() {
 
     int number_of_packet = 0;
     auto check_packet = [&] (dzb::Packet const& packet) {
-        //print_packet(packet);
         ++number_of_packet;
 
-        dzb::PacketReader reader(packet);
+        logln("Packet emitted:");
+        test_packet(packet);
 
-        //print_packet_reader(reader);
-
-        float temp = 0;
-        uint8_t batt_percent0 = 0, batt_percent1 = 0;
-        uint8_t lum = 0;
-        bool gpio_d1 = false;
-        uint16_t gpio_a0 = 0;
-
-        if (
-            reader.get_value(dzb::PacketType::TEMPERATURE, 0, temp) && 
-            reader.get_value(dzb::PacketType::BATT_PERCENT, 0, batt_percent0) &&
-            reader.get_value(dzb::PacketType::BATT_PERCENT, 1, batt_percent1) &&
-            reader.get_value(dzb::PacketType::LUMINOSITY, 0, lum) &&
-            reader.get_value(dzb::PacketType::GPIO_D1, 0, gpio_d1) &&
-            reader.get_value(dzb::PacketType::GPIO_A0, 0, gpio_a0) &&
-            true
-        ) {
-            TEST_ASSERT_EQUAL_UINT8(85, batt_percent0);
-            TEST_ASSERT_EQUAL_UINT8(12, batt_percent1);
-
-            TEST_ASSERT_EQUAL_UINT8(32, lum);
-
-            TEST_ASSERT_EQUAL_UINT16(2020, gpio_a0);
-
-            TEST_ASSERT_FLOAT_WITHIN(0.1, 21, temp);
-
-            TEST_ASSERT_EQUAL(true, gpio_d1);
-        } else {
-            errln("Some value could not be retrieved");
-            TEST_FAIL();
-        }
+        auto deconstructed_packet = dzb::Packet::deconstruct(packet.buffer.data(), packet.buffer.size());
+        logln("Packet deconstructed:");
+        test_packet(deconstructed_packet);
     };
 
     dzb::PacketWriter writer(dzb::id_t{ 'A', 'Z' }, 16 /* bytes */, check_packet);
