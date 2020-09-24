@@ -51,7 +51,7 @@ class LoraReceiver : public Component {
     //float factor;
 
 
-    static void parse_packet(dzb::Packet const& packet) {
+    void parse_packet(dzb::Packet const& packet) {
 
       if (!packet.is_crc_valid()) {
         // TODO: handle error
@@ -75,35 +75,35 @@ class LoraReceiver : public Component {
         }
 
         if(reader.get_value(dzb::PacketType::PRESENCE, 0, state.devicePirState)) {
-          device_J7_pir_state.publish_state(state.devicePirState);
+          device_J7_pir_state->publish_state(state.devicePirState);
         }
         else {
           Serial.printf("[PACKET][FROM:%s][ERROR] Could not get PRESENCE\n", devicestring);
         }
 
         if(reader.get_value(dzb::PacketType::ALARM, 0, state.deviceAlarmActive)) {
-          device_J7_alarm_isactive.publish_state(state.deviceAlarmActive)
+          device_J7_alarm_isactive->publish_state(state.deviceAlarmActive);
         }
         else {
           Serial.printf("[PACKET][FROM:%s][ERROR] Could not get ALARM\n", devicestring);
         }
 
         if(reader.get_value(dzb::PacketType::BATT_LOW, 0, state.deviceLowBatt)) {
-          device_J7_batt_islow.publish_state(state.deviceLowBatt)
+          device_J7_batt_islow->publish_state(state.deviceLowBatt);
         }
         else {
           Serial.printf("[PACKET][FROM:%s][ERROR] Could not get BATT_LOW\n" , devicestring);
         }
 
         if(reader.get_value(dzb::PacketType::BATT_PERCENT, 0, state.deviceBattPercent)) {
-          device_J7_batt_percent.publish_state(state.deviceBattPercent)
+          device_J7_batt_percent->publish_state(state.deviceBattPercent);
         }
         else {
           Serial.printf("[PACKET][FROM:%s][ERROR] Could not get BATT_PERCENT\n", devicestring);
         }
 
         if(reader.get_value(dzb::PacketType::BATT_VOLTAGE, 0, state.deviceBattVoltage)) {
-          device_J7_batt_voltage.publish_state(state.deviceBattVoltage)
+          device_J7_batt_voltage->publish_state(state.deviceBattVoltage);
         }
         else {
           Serial.printf("[PACKET][FROM:%s][ERROR] Could not get BATT_VOLTAGE\n", devicestring);
@@ -123,7 +123,7 @@ class LoraReceiver : public Component {
 
     }
 
-    static void on_lora_packet_received(int size) {
+    void on_lora_packet_received(int size) {
 
       std::vector<uint8_t> buffer(size);
 
@@ -195,8 +195,8 @@ class LoraReceiver : public Component {
       device_J7_pir_state->clear_filters();
       device_J7_alarm_isactive->clear_filters();
 
-      LoRa.onReceive(on_lora_packet_received);
-      LoRa.receive();
+      //LoRa.onReceive(on_lora_packet_received);
+      //LoRa.receive();
     }
 
     void loop() override {
@@ -221,10 +221,9 @@ class LoraReceiver : public Component {
       }
 
       //check incoming lora message
-
-      //int packetSize = LoRa.parsePacket(sizeof(DeviceDataStruct));
-      //if(packetSize){
-      //  handleRadioData();
-      //}
+      int packetSize = LoRa.parsePacket();
+      if(packetSize){
+        on_lora_packet_received(packetSize);
+      }
     }
 };
