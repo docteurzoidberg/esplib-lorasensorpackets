@@ -26,7 +26,7 @@ sensor:
     };
   sensors:
   - name: "J7 IDS battery voltage"
-    accuracy_decimals: 1
+    accuracy_decimals: 2
     icon: mdi:battery
     unit_of_measurement: v
   - name: "J7 IDS battery percentage"

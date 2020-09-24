@@ -47,9 +47,6 @@ static DeviceJ7DataStruct state = {
 
 class LoraReceiver : public Component {
   private:
-    //GPIOPin *pin;
-    //float factor;
-
 
     void parse_packet(dzb::Packet const& packet) {
 
